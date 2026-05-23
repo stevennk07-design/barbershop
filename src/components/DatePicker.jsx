@@ -1,0 +1,126 @@
+import { useEffect, useState } from 'react'
+import { supabase } from '../supabaseClient'
+
+const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December']
+
+export default function DatePicker({ selectedDate, onSelect }) {
+  const [weeklyHours, setWeeklyHours] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [viewMonth, setViewMonth] = useState(() => {
+    const today = new Date()
+    return { year: today.getFullYear(), month: today.getMonth() }
+  })
+
+  useEffect(() => {
+    async function fetchHours() {
+      const { data, error } = await supabase.from('weekly_hours').select('*')
+      if (!error) setWeeklyHours(data)
+      setLoading(false)
+    }
+    fetchHours()
+  }, [])
+
+  if (loading) return <p className="text-gray-500">Loading calendar...</p>
+
+  // Build a lookup: day_of_week → is_open
+  const openDays = {}
+  weeklyHours.forEach((row) => {
+    openDays[row.day_of_week] = row.is_open
+  })
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const { year, month } = viewMonth
+  const firstDay = new Date(year, month, 1).getDay()
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+
+  function changeMonth(delta) {
+    let newMonth = month + delta
+    let newYear = year
+    if (newMonth < 0) { newMonth = 11; newYear-- }
+    if (newMonth > 11) { newMonth = 0; newYear++ }
+    setViewMonth({ year: newYear, month: newMonth })
+  }
+
+  function selectDate(day) {
+    const date = new Date(year, month, day)
+    // Format as YYYY-MM-DD (local, not UTC)
+    const iso = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+    onSelect(iso)
+  }
+
+  // Block navigating to past months
+  const isCurrentOrFuture =
+    year > today.getFullYear() ||
+    (year === today.getFullYear() && month >= today.getMonth())
+  const canGoBack =
+    year > today.getFullYear() ||
+    (year === today.getFullYear() && month > today.getMonth())
+
+  return (
+    <div>
+      <h2 className="text-sm font-medium uppercase tracking-wider text-gray-500 mb-3">
+        Pick a date
+      </h2>
+
+      <div className="flex items-center justify-between mb-3">
+        <button
+          onClick={() => changeMonth(-1)}
+          disabled={!canGoBack}
+          className="px-3 py-1 text-sm rounded border border-gray-200 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          ←
+        </button>
+        <div className="font-medium">{MONTH_NAMES[month]} {year}</div>
+        <button
+          onClick={() => changeMonth(1)}
+          className="px-3 py-1 text-sm rounded border border-gray-200 hover:bg-gray-100"
+        >
+          →
+        </button>
+      </div>
+
+      <div className="grid grid-cols-7 gap-1">
+        {DAY_LABELS.map((d) => (
+          <div key={d} className="text-center text-xs text-gray-500 py-1">{d}</div>
+        ))}
+
+        {/* Empty cells before the first day */}
+        {Array.from({ length: firstDay }).map((_, i) => (
+          <div key={`empty-${i}`} />
+        ))}
+
+        {Array.from({ length: daysInMonth }).map((_, i) => {
+          const day = i + 1
+          const date = new Date(year, month, day)
+          const dow = date.getDay()
+          const iso = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+
+          const isPast = date < today
+          const isClosed = openDays[dow] === false
+          const isToday = date.getTime() === today.getTime()
+          const isSelected = selectedDate === iso
+          const disabled = isPast || isClosed
+
+          let classes = 'text-center text-sm py-2 rounded transition '
+          if (isSelected) classes += 'bg-gray-900 text-white'
+          else if (disabled) classes += 'text-gray-300 cursor-not-allowed' + (isClosed && !isPast ? ' line-through' : '')
+          else classes += 'hover:bg-gray-100 cursor-pointer'
+          if (isToday && !isSelected) classes += ' font-medium text-amber-700'
+
+          return (
+            <button
+              key={day}
+              onClick={() => !disabled && selectDate(day)}
+              disabled={disabled}
+              className={classes}
+            >
+              {day}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
