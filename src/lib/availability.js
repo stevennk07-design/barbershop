@@ -1,21 +1,18 @@
 // Pure logic for computing available time slots on a given date.
-// Inputs: shop hours, blocks, existing appointments, service duration
+// Inputs: shop hours, one-off blocks, recurring blocks, existing appointments, service duration
 // Output: array of { time: "HH:MM", label: "9:00 AM", available: boolean }
 
-// Convert "HH:MM" → minutes since midnight
 function toMinutes(timeStr) {
   const [h, m] = timeStr.split(':').map(Number)
   return h * 60 + m
 }
 
-// Convert minutes → "HH:MM"
 function toTimeStr(mins) {
   const h = Math.floor(mins / 60)
   const m = mins % 60
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
 }
 
-// Format "HH:MM" → "9:00 AM"
 function formatLabel(timeStr) {
   const [h, m] = timeStr.split(':').map(Number)
   const mer = h < 12 ? 'AM' : 'PM'
@@ -23,12 +20,11 @@ function formatLabel(timeStr) {
   return `${hr}:${String(m).padStart(2, '0')} ${mer}`
 }
 
-// Check if two time ranges overlap
 function overlaps(aStart, aEnd, bStart, bEnd) {
   return aStart < bEnd && bStart < aEnd
 }
 
-export function computeTimeSlots(weeklyRow, blocks, appts, serviceDuration, now, dateStr) {
+export function computeTimeSlots(weeklyRow, blocks, recurringBlocks, appts, serviceDuration, now, dateStr) {
   if (!weeklyRow || !weeklyRow.is_open) return []
 
   const openMin = toMinutes(weeklyRow.open_time)
@@ -41,6 +37,7 @@ export function computeTimeSlots(weeklyRow, blocks, appts, serviceDuration, now,
 
   const busyRanges = [
     ...blocks.map((b) => [toMinutes(b.start_time), toMinutes(b.end_time)]),
+    ...recurringBlocks.map((b) => [toMinutes(b.start_time), toMinutes(b.end_time)]),
     ...appts.map((a) => [toMinutes(a.start_time), toMinutes(a.end_time)]),
   ]
 

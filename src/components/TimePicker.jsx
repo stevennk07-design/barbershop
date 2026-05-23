@@ -12,20 +12,18 @@ export default function TimePicker({ date, service, selectedTime, onSelect }) {
       setLoading(true)
       setError(null)
 
-      // Day of week for this date
-      // Parse as local date (YYYY-MM-DD) to avoid UTC issues
       const [y, m, d] = date.split('-').map(Number)
       const dateObj = new Date(y, m - 1, d)
       const dayOfWeek = dateObj.getDay()
 
-      // Fetch in parallel
-      const [hoursRes, blocksRes, apptsRes] = await Promise.all([
+      const [hoursRes, blocksRes, recurringRes, apptsRes] = await Promise.all([
         supabase.from('weekly_hours').select('*').eq('day_of_week', dayOfWeek).single(),
         supabase.from('availability_blocks').select('*').eq('date', date),
+        supabase.from('recurring_blocks').select('*').eq('day_of_week', dayOfWeek),
         supabase.from('appointments').select('start_time, end_time').eq('appointment_date', date).neq('status', 'cancelled'),
       ])
 
-      if (hoursRes.error || blocksRes.error || apptsRes.error) {
+      if (hoursRes.error || blocksRes.error || recurringRes.error || apptsRes.error) {
         setError('Could not load availability.')
         setLoading(false)
         return
@@ -34,6 +32,7 @@ export default function TimePicker({ date, service, selectedTime, onSelect }) {
       const computed = computeTimeSlots(
         hoursRes.data,
         blocksRes.data || [],
+        recurringRes.data || [],
         apptsRes.data || [],
         service.duration_minutes,
         new Date(),
