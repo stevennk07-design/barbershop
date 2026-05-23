@@ -15,34 +15,34 @@ function formatTime(timeStr) {
 export default function BookingSuccess({ booking, onBookAnother }) {
   return (
     <div className="text-center py-10">
-      <div className="text-5xl mb-4">✓</div>
-      <h2 className="text-2xl font-bold mb-2">You're booked!</h2>
-      <p className="text-gray-500 mb-6">
-        We'll send a reminder before your appointment.
+      <div className="text-5xl mb-4 text-neutral-100">✓</div>
+      <h2 className="text-2xl font-bold mb-2 text-neutral-100">You're booked!</h2>
+      <p className="text-neutral-500 mb-6">
+        We'll see you soon.
       </p>
 
-      <div className="bg-gray-50 rounded-lg p-4 text-left mb-6">
-        <div className="flex justify-between py-1.5 border-b border-gray-100 text-sm">
-          <span className="text-gray-500">Name</span>
-          <span>{booking.customerName}</span>
+      <div className="bg-neutral-950 border border-neutral-800 rounded-lg p-4 text-left mb-6">
+        <div className="flex justify-between py-1.5 border-b border-neutral-900 text-sm">
+          <span className="text-neutral-500">Name</span>
+          <span className="text-neutral-200">{booking.customerName}</span>
         </div>
-        <div className="flex justify-between py-1.5 border-b border-gray-100 text-sm">
-          <span className="text-gray-500">Service</span>
-          <span>{booking.service.name}</span>
+        <div className="flex justify-between py-1.5 border-b border-neutral-900 text-sm">
+          <span className="text-neutral-500">Service</span>
+          <span className="text-neutral-200">{booking.service.name}</span>
         </div>
-        <div className="flex justify-between py-1.5 border-b border-gray-100 text-sm">
-          <span className="text-gray-500">Date & time</span>
-          <span>{formatDate(booking.date)} · {formatTime(booking.time)}</span>
+        <div className="flex justify-between py-1.5 border-b border-neutral-900 text-sm">
+          <span className="text-neutral-500">Date & time</span>
+          <span className="text-neutral-200">{formatDate(booking.date)} · {formatTime(booking.time)}</span>
         </div>
         <div className="flex justify-between py-1.5 text-sm">
-          <span className="text-gray-500">Total</span>
-          <span className="font-medium">${booking.service.price}</span>
+          <span className="text-neutral-500">Total</span>
+          <span className="font-medium text-neutral-100">${booking.service.price}</span>
         </div>
       </div>
 
       <button
         onClick={onBookAnother}
-        className="px-6 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50"
+        className="px-6 py-2 border border-neutral-800 rounded-lg text-sm hover:bg-neutral-900 text-neutral-300"
       >
         Book another →
       </button>
