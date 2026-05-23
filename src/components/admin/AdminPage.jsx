@@ -38,7 +38,7 @@ export default function AdminPage() {
   if (!session) return <AdminLogin />
 
   return (
-    <div className="min-h-screen bg-black text-neutral-100 p-8">
+    <div className="min-h-screen bg-black text-neutral-100 p-4 sm:p-8">
       <div className="max-w-3xl mx-auto">
         <header className="flex justify-between items-center mb-6 pb-4 border-b border-neutral-800">
           <div>

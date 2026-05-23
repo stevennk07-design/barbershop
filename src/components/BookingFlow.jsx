@@ -22,7 +22,7 @@ export default function BookingFlow() {
 
   return (
     <div className="min-h-screen bg-black text-neutral-100 flex flex-col">
-      <div className="flex-1 p-8">
+      <div className="flex-1 p-4 sm:p-8">
         <div className="max-w-2xl mx-auto">
           <header className="text-center mb-10 pb-6 border-b border-neutral-800">
             <h1 className="text-4xl font-bold tracking-tight">Matanza Cutz</h1>
@@ -142,7 +142,7 @@ export default function BookingFlow() {
       </div>
 
       <footer className="border-t border-neutral-800 mt-10">
-        <div className="max-w-2xl mx-auto px-8 py-6 text-center text-sm text-neutral-500">
+        <div className="max-w-2xl mx-auto px-4 sm:px-8 py-6 text-center text-sm text-neutral-500">
           <div className="space-x-4">
             <span>123 Example St, City</span>
             <span>·</span>
