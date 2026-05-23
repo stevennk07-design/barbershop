@@ -22,15 +22,26 @@ export default function WeeklyHours() {
     setLoading(false)
   }
 
-  async function updateField(id, field, value) {
+  // Save to DB — only called on blur or toggle
+  async function saveField(id, field, value) {
     setSavingId(id)
-    setHours((prev) => prev.map((h) => (h.id === id ? { ...h, [field]: value } : h)))
     const { error } = await supabase.from('weekly_hours').update({ [field]: value }).eq('id', id)
     if (error) {
       alert('Could not save: ' + error.message)
       fetchHours()
     }
     setSavingId(null)
+  }
+
+  // Local update only — doesn't hit DB
+  function updateLocal(id, field, value) {
+    setHours((prev) => prev.map((h) => (h.id === id ? { ...h, [field]: value } : h)))
+  }
+
+  // Toggle saves immediately (no typing involved)
+  async function toggleOpen(h) {
+    updateLocal(h.id, 'is_open', !h.is_open)
+    await saveField(h.id, 'is_open', !h.is_open)
   }
 
   if (loading) return <p className="text-neutral-500">Loading...</p>
@@ -47,7 +58,7 @@ export default function WeeklyHours() {
             <div className="font-medium w-28 text-neutral-100">{DAY_NAMES[h.day_of_week]}</div>
 
             <button
-              onClick={() => updateField(h.id, 'is_open', !h.is_open)}
+              onClick={() => toggleOpen(h)}
               className={`relative w-10 h-5 rounded-full transition ${h.is_open ? 'bg-neutral-100' : 'bg-neutral-700'}`}
               aria-label="Toggle open"
             >
@@ -58,14 +69,16 @@ export default function WeeklyHours() {
               <input
                 type="time"
                 value={h.open_time?.slice(0, 5) || ''}
-                onChange={(e) => updateField(h.id, 'open_time', e.target.value)}
+                onChange={(e) => updateLocal(h.id, 'open_time', e.target.value)}
+                onBlur={(e) => saveField(h.id, 'open_time', e.target.value)}
                 className="px-2 py-1 rounded border border-neutral-800 bg-neutral-950 text-neutral-100"
               />
               <span className="text-sm text-neutral-500">to</span>
               <input
                 type="time"
                 value={h.close_time?.slice(0, 5) || ''}
-                onChange={(e) => updateField(h.id, 'close_time', e.target.value)}
+                onChange={(e) => updateLocal(h.id, 'close_time', e.target.value)}
+                onBlur={(e) => saveField(h.id, 'close_time', e.target.value)}
                 className="px-2 py-1 rounded border border-neutral-800 bg-neutral-950 text-neutral-100"
               />
             </div>
