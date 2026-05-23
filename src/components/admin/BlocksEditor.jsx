@@ -7,28 +7,28 @@ export default function BlocksEditor() {
 
   return (
     <div>
-      <p className="text-sm text-gray-500 mb-4">
-        Set times when you're not available. <strong>Recurring</strong> blocks repeat every week (e.g. lunch every Monday). <strong>One-off</strong> blocks apply to a single date only.
+      <p className="text-sm text-neutral-500 mb-4">
+        Set times when you're not available. <strong className="text-neutral-300">Recurring</strong> blocks repeat every week (e.g. lunch every Monday). <strong className="text-neutral-300">One-off</strong> blocks apply to a single date only.
       </p>
 
       <div className="flex gap-2 mb-4 text-sm">
         <button
           onClick={() => setSection('recurring')}
-          className={`px-3 py-1.5 rounded border ${
+          className={
             section === 'recurring'
-              ? 'bg-gray-100 border-gray-300 font-medium'
-              : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-          }`}
+              ? 'px-3 py-1.5 rounded border bg-neutral-100 border-neutral-100 font-medium text-black'
+              : 'px-3 py-1.5 rounded border bg-neutral-950 border-neutral-800 text-neutral-300 hover:bg-neutral-900'
+          }
         >
           Recurring (weekly)
         </button>
         <button
           onClick={() => setSection('oneoff')}
-          className={`px-3 py-1.5 rounded border ${
+          className={
             section === 'oneoff'
-              ? 'bg-gray-100 border-gray-300 font-medium'
-              : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-          }`}
+              ? 'px-3 py-1.5 rounded border bg-neutral-100 border-neutral-100 font-medium text-black'
+              : 'px-3 py-1.5 rounded border bg-neutral-950 border-neutral-800 text-neutral-300 hover:bg-neutral-900'
+          }
         >
           One-off (specific date)
         </button>

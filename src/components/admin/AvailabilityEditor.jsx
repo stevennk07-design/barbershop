@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react'
-import { supabase } from '../../supabaseClient'
+import { useState } from 'react'
 import WeeklyHours from './WeeklyHours'
 import BlocksEditor from './BlocksEditor'
 
@@ -11,21 +10,21 @@ export default function AvailabilityEditor() {
       <div className="flex gap-2 mb-4 text-sm">
         <button
           onClick={() => setSection('weekly')}
-          className={`px-3 py-1.5 rounded border ${
+          className={
             section === 'weekly'
-              ? 'bg-gray-100 border-gray-300 font-medium'
-              : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-          }`}
+              ? 'px-3 py-1.5 rounded border bg-neutral-100 border-neutral-100 font-medium text-black'
+              : 'px-3 py-1.5 rounded border bg-neutral-950 border-neutral-800 text-neutral-300 hover:bg-neutral-900'
+          }
         >
           Weekly hours
         </button>
         <button
           onClick={() => setSection('blocks')}
-          className={`px-3 py-1.5 rounded border ${
+          className={
             section === 'blocks'
-              ? 'bg-gray-100 border-gray-300 font-medium'
-              : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-          }`}
+              ? 'px-3 py-1.5 rounded border bg-neutral-100 border-neutral-100 font-medium text-black'
+              : 'px-3 py-1.5 rounded border bg-neutral-950 border-neutral-800 text-neutral-300 hover:bg-neutral-900'
+          }
         >
           Day blocks
         </button>

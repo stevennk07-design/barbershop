@@ -21,9 +21,8 @@ export default function DatePicker({ selectedDate, onSelect }) {
     fetchHours()
   }, [])
 
-  if (loading) return <p className="text-gray-500">Loading calendar...</p>
+  if (loading) return <p className="text-neutral-500">Loading calendar...</p>
 
-  // Build a lookup: day_of_week → is_open
   const openDays = {}
   weeklyHours.forEach((row) => {
     openDays[row.day_of_week] = row.is_open
@@ -45,22 +44,17 @@ export default function DatePicker({ selectedDate, onSelect }) {
 
   function selectDate(day) {
     const date = new Date(year, month, day)
-    // Format as YYYY-MM-DD (local, not UTC)
     const iso = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
     onSelect(iso)
   }
 
-  // Block navigating to past months
-  const isCurrentOrFuture =
-    year > today.getFullYear() ||
-    (year === today.getFullYear() && month >= today.getMonth())
   const canGoBack =
     year > today.getFullYear() ||
     (year === today.getFullYear() && month > today.getMonth())
 
   return (
     <div>
-      <h2 className="text-sm font-medium uppercase tracking-wider text-gray-500 mb-3">
+      <h2 className="text-xs font-medium uppercase tracking-wider text-neutral-500 mb-3">
         Pick a date
       </h2>
 
@@ -68,14 +62,14 @@ export default function DatePicker({ selectedDate, onSelect }) {
         <button
           onClick={() => changeMonth(-1)}
           disabled={!canGoBack}
-          className="px-3 py-1 text-sm rounded border border-gray-200 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="px-3 py-1 text-sm rounded border border-neutral-800 hover:bg-neutral-900 disabled:opacity-20 disabled:cursor-not-allowed"
         >
           ←
         </button>
         <div className="font-medium">{MONTH_NAMES[month]} {year}</div>
         <button
           onClick={() => changeMonth(1)}
-          className="px-3 py-1 text-sm rounded border border-gray-200 hover:bg-gray-100"
+          className="px-3 py-1 text-sm rounded border border-neutral-800 hover:bg-neutral-900"
         >
           →
         </button>
@@ -83,10 +77,9 @@ export default function DatePicker({ selectedDate, onSelect }) {
 
       <div className="grid grid-cols-7 gap-1">
         {DAY_LABELS.map((d) => (
-          <div key={d} className="text-center text-xs text-gray-500 py-1">{d}</div>
+          <div key={d} className="text-center text-xs text-neutral-500 py-1">{d}</div>
         ))}
 
-        {/* Empty cells before the first day */}
         {Array.from({ length: firstDay }).map((_, i) => (
           <div key={`empty-${i}`} />
         ))}
@@ -104,10 +97,10 @@ export default function DatePicker({ selectedDate, onSelect }) {
           const disabled = isPast || isClosed
 
           let classes = 'text-center text-sm py-2 rounded transition '
-          if (isSelected) classes += 'bg-gray-900 text-white'
-          else if (disabled) classes += 'text-gray-300 cursor-not-allowed' + (isClosed && !isPast ? ' line-through' : '')
-          else classes += 'hover:bg-gray-100 cursor-pointer'
-          if (isToday && !isSelected) classes += ' font-medium text-amber-700'
+          if (isSelected) classes += 'bg-neutral-100 text-black font-medium'
+          else if (disabled) classes += 'text-neutral-700 cursor-not-allowed' + (isClosed && !isPast ? ' line-through' : '')
+          else classes += 'hover:bg-neutral-900 cursor-pointer text-neutral-200'
+          if (isToday && !isSelected) classes += ' ring-1 ring-neutral-700'
 
           return (
             <button

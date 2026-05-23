@@ -46,16 +46,16 @@ export default function TimePicker({ date, service, selectedTime, onSelect }) {
     fetchAvailability()
   }, [date, service])
 
-  if (loading) return <p className="text-gray-500">Loading available times...</p>
-  if (error) return <p className="text-red-600">{error}</p>
+  if (loading) return <p className="text-neutral-500">Loading available times...</p>
+  if (error) return <p className="text-red-400">{error}</p>
 
   if (slots.length === 0) {
     return (
       <div>
-        <h2 className="text-sm font-medium uppercase tracking-wider text-gray-500 mb-3">
+        <h2 className="text-xs font-medium uppercase tracking-wider text-neutral-500 mb-3">
           Available times
         </h2>
-        <p className="text-gray-500 py-8 text-center">
+        <p className="text-neutral-500 py-8 text-center">
           The shop is closed on this day. Please pick another date.
         </p>
       </div>
@@ -66,11 +66,11 @@ export default function TimePicker({ date, service, selectedTime, onSelect }) {
 
   return (
     <div>
-      <h2 className="text-sm font-medium uppercase tracking-wider text-gray-500 mb-3">
+      <h2 className="text-xs font-medium uppercase tracking-wider text-neutral-500 mb-3">
         Available times
       </h2>
       {!anyAvailable && (
-        <p className="text-gray-500 mb-3">
+        <p className="text-neutral-500 mb-3">
           No times available on this day. Please pick another date.
         </p>
       )}
@@ -78,9 +78,9 @@ export default function TimePicker({ date, service, selectedTime, onSelect }) {
         {slots.map((slot) => {
           const isSelected = selectedTime === slot.time
           let classes = 'py-2.5 text-center text-sm rounded-lg border transition '
-          if (isSelected) classes += 'bg-gray-900 text-white border-gray-900'
-          else if (!slot.available) classes += 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
-          else classes += 'bg-white border-gray-200 hover:border-gray-400 cursor-pointer'
+          if (isSelected) classes += 'bg-neutral-100 text-black border-neutral-100 font-medium'
+          else if (!slot.available) classes += 'bg-neutral-900 text-neutral-600 border-neutral-800 cursor-not-allowed'
+          else classes += 'bg-neutral-950 border-neutral-800 hover:border-neutral-600 cursor-pointer text-neutral-200'
 
           return (
             <button

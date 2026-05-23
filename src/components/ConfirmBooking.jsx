@@ -38,7 +38,6 @@ export default function ConfirmBooking({ booking, onConfirmed }) {
 
     const endTime = addMinutes(booking.time, booking.service.duration_minutes)
 
-    // Re-check that the slot is still free (race condition guard)
     const { data: conflicts, error: checkErr } = await supabase
       .from('appointments')
       .select('id')
@@ -59,7 +58,6 @@ export default function ConfirmBooking({ booking, onConfirmed }) {
       return
     }
 
-    // Insert the appointment
     const { data, error: insertErr } = await supabase
       .from('appointments')
       .insert({
@@ -83,37 +81,21 @@ export default function ConfirmBooking({ booking, onConfirmed }) {
     onConfirmed({ ...booking, customerName: name.trim(), confirmationId: data.id })
   }
 
+  const inputClass = "w-full px-3 py-2.5 mb-2 rounded-lg border border-neutral-800 bg-neutral-950 text-neutral-100 placeholder-neutral-600 focus:border-neutral-600 focus:outline-none"
+
   return (
     <div>
-      <h2 className="text-sm font-medium uppercase tracking-wider text-gray-500 mb-3">
+      <h2 className="text-xs font-medium uppercase tracking-wider text-neutral-500 mb-3">
         Your details
       </h2>
-      <input
-        type="text"
-        placeholder="Full name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className="w-full px-3 py-2.5 mb-2 rounded-lg border border-gray-200 focus:border-gray-400 focus:outline-none"
-      />
-      <input
-        type="tel"
-        placeholder="Phone number"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-        className="w-full px-3 py-2.5 mb-2 rounded-lg border border-gray-200 focus:border-gray-400 focus:outline-none"
-      />
-      <input
-        type="email"
-        placeholder="Email (optional)"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="w-full px-3 py-2.5 mb-4 rounded-lg border border-gray-200 focus:border-gray-400 focus:outline-none"
-      />
+      <input type="text" placeholder="Full name" value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
+      <input type="tel" placeholder="Phone number" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputClass} />
+      <input type="email" placeholder="Email (optional)" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass + ' mb-4'} />
 
-      <h2 className="text-sm font-medium uppercase tracking-wider text-gray-500 mb-3 mt-4">
+      <h2 className="text-xs font-medium uppercase tracking-wider text-neutral-500 mb-3 mt-4">
         Booking summary
       </h2>
-      <div className="border border-gray-200 rounded-lg p-4 mb-4 bg-white">
+      <div className="border border-neutral-800 rounded-lg p-4 mb-4 bg-neutral-950">
         <SummaryRow label="Service" value={booking.service.name} />
         <SummaryRow label="Date" value={formatDate(booking.date)} />
         <SummaryRow label="Time" value={formatTime(booking.time)} />
@@ -122,7 +104,7 @@ export default function ConfirmBooking({ booking, onConfirmed }) {
       </div>
 
       {error && (
-        <p className="text-red-600 text-sm mb-3 p-3 bg-red-50 border border-red-200 rounded">
+        <p className="text-red-400 text-sm mb-3 p-3 bg-red-950 border border-red-900 rounded">
           {error}
         </p>
       )}
@@ -130,7 +112,7 @@ export default function ConfirmBooking({ booking, onConfirmed }) {
       <button
         onClick={handleSubmit}
         disabled={!canSubmit}
-        className="w-full py-3 rounded-lg bg-gray-900 text-white font-medium disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90"
+        className="w-full py-3 rounded-lg bg-neutral-100 text-black font-medium disabled:opacity-20 disabled:cursor-not-allowed hover:bg-white"
       >
         {submitting ? 'Booking...' : 'Confirm booking →'}
       </button>
@@ -140,9 +122,9 @@ export default function ConfirmBooking({ booking, onConfirmed }) {
 
 function SummaryRow({ label, value, bold }) {
   return (
-    <div className="flex justify-between py-1.5 border-b border-gray-100 last:border-0 text-sm">
-      <span className="text-gray-500">{label}</span>
-      <span className={bold ? 'font-medium' : ''}>{value}</span>
+    <div className="flex justify-between py-1.5 border-b border-neutral-900 last:border-0 text-sm">
+      <span className="text-neutral-500">{label}</span>
+      <span className={bold ? 'font-medium text-neutral-100' : 'text-neutral-200'}>{value}</span>
     </div>
   )
 }
