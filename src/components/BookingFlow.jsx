@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { supabase } from '../supabaseClient'
 import ServicePicker from './ServicePicker'
 import DatePicker from './DatePicker'
 import TimePicker from './TimePicker'
@@ -9,6 +10,20 @@ export default function BookingFlow() {
   const [step, setStep] = useState(1)
   const [booking, setBooking] = useState({ service: null, date: null, time: null })
   const [confirmedBooking, setConfirmedBooking] = useState(null)
+  const [settings, setSettings] = useState(null)
+
+  useEffect(() => {
+    async function fetchSettings() {
+      const { data } = await supabase.from('shop_settings').select('*').eq('id', 1).single()
+      if (data) {
+        setSettings(data)
+        if (data.shop_name) {
+          document.title = data.shop_name
+        }
+      }
+    }
+    fetchSettings()
+  }, [])
 
   function updateBooking(changes) {
     setBooking((prev) => ({ ...prev, ...changes }))
@@ -20,13 +35,23 @@ export default function BookingFlow() {
     setStep(1)
   }
 
+  // Build the footer contact line dynamically
+  const footerParts = []
+  if (settings?.address) footerParts.push(settings.address)
+  if (settings?.phone) footerParts.push(settings.phone)
+  if (settings?.email) footerParts.push(settings.email)
+
   return (
     <div className="min-h-screen bg-black text-neutral-100 flex flex-col">
       <div className="flex-1 p-4 sm:p-8">
         <div className="max-w-2xl mx-auto">
           <header className="text-center mb-10 pb-6 border-b border-neutral-800">
-            <h1 className="text-4xl font-bold tracking-tight">Matanza Cutz</h1>
-            {/* <p className="text-sm text-neutral-400 mt-2">Tagline goes here</p> */}
+            <h1 className="text-4xl font-bold tracking-tight">
+              {settings?.shop_name || 'Loading...'}
+            </h1>
+            {settings?.tagline && (
+              <p className="text-sm text-neutral-400 mt-2">{settings.tagline}</p>
+            )}
           </header>
 
           {confirmedBooking ? (
@@ -141,15 +166,20 @@ export default function BookingFlow() {
         </div>
       </div>
 
-      <footer className="border-t border-neutral-800 mt-10">
-        <div className="max-w-2xl mx-auto px-4 sm:px-8 py-6 text-center text-sm text-neutral-500">
-          <div className="space-x-4">
-            <span>123 Example St, City</span>
-            <span>·</span>
-            <span>(555) 555-5555</span>
+      {footerParts.length > 0 && (
+        <footer className="border-t border-neutral-800 mt-10">
+          <div className="max-w-2xl mx-auto px-4 sm:px-8 py-6 text-center text-sm text-neutral-500">
+            <div className="flex flex-wrap justify-center gap-x-4 gap-y-1">
+              {footerParts.map((part, i) => (
+                <span key={i} className="flex items-center gap-x-4">
+                  {i > 0 && <span className="text-neutral-700">·</span>}
+                  {part}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      )}
     </div>
   )
 }

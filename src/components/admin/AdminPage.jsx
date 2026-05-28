@@ -4,6 +4,7 @@ import AdminLogin from './AdminLogin'
 import AppointmentsView from './AppointmentsView'
 import AvailabilityEditor from './AvailabilityEditor'
 import ServicesEditor from './ServicesEditor'
+import SettingsEditor from './SettingsEditor'
 
 export default function AdminPage() {
   const [session, setSession] = useState(null)
@@ -42,7 +43,7 @@ export default function AdminPage() {
       <div className="max-w-3xl mx-auto">
         <header className="flex justify-between items-center mb-6 pb-4 border-b border-neutral-800">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Matanza Cutz · Admin</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Admin</h1>
             <p className="text-sm text-neutral-500 mt-1">Signed in as {session.user.email}</p>
           </div>
           <button
@@ -57,6 +58,7 @@ export default function AdminPage() {
         {activeTab === 'appointments' && <AppointmentsView />}
         {activeTab === 'availability' && <AvailabilityEditor />}
         {activeTab === 'services' && <ServicesEditor />}
+        {activeTab === 'settings' && <SettingsEditor />}
       </div>
     </div>
   )
@@ -66,10 +68,11 @@ function TabBar({ active, onChange }) {
   const tabs = [
     { id: 'appointments', label: 'Appointments' },
     { id: 'availability', label: 'Availability' },
-    { id: 'services', label: 'Services & pricing' },
+    { id: 'services', label: 'Services' },
+    { id: 'settings', label: 'Shop info' },
   ]
   return (
-    <div className="flex gap-2 mb-6">
+    <div className="flex gap-2 mb-6 flex-wrap">
       {tabs.map((t) => (
         <button
           key={t.id}
