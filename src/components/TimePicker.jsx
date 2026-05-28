@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { computeTimeSlots } from '../lib/availability'
 
-export default function TimePicker({ date, service, selectedTime, onSelect }) {
+export default function TimePicker({ date, service, selectedTime, onSelect, onLocationResolved }) {
   const [slots, setSlots] = useState([])
+  const [location, setLocation] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -11,16 +12,30 @@ export default function TimePicker({ date, service, selectedTime, onSelect }) {
     async function fetchAvailability() {
       setLoading(true)
       setError(null)
+      setLocation(null)
 
       const [y, m, d] = date.split('-').map(Number)
       const dateObj = new Date(y, m - 1, d)
       const dayOfWeek = dateObj.getDay()
 
-      const [hoursRes, blocksRes, recurringRes, apptsRes] = await Promise.all([
-        supabase.from('weekly_hours').select('*').eq('day_of_week', dayOfWeek).single(),
+      const [hoursRes, blocksRes, recurringRes, apptsRes, overrideRes] = await Promise.all([
+        supabase
+          .from('weekly_hours')
+          .select('*, locations(id, name, address)')
+          .eq('day_of_week', dayOfWeek)
+          .single(),
         supabase.from('availability_blocks').select('*').eq('date', date),
         supabase.from('recurring_blocks').select('*').eq('day_of_week', dayOfWeek),
-        supabase.from('appointments').select('start_time, end_time').eq('appointment_date', date).neq('status', 'cancelled'),
+        supabase
+          .from('appointments')
+          .select('start_time, end_time')
+          .eq('appointment_date', date)
+          .neq('status', 'cancelled'),
+        supabase
+          .from('location_overrides')
+          .select('*, locations(id, name, address)')
+          .eq('date', date)
+          .maybeSingle(),
       ])
 
       if (hoursRes.error || blocksRes.error || recurringRes.error || apptsRes.error) {
@@ -28,6 +43,17 @@ export default function TimePicker({ date, service, selectedTime, onSelect }) {
         setLoading(false)
         return
       }
+
+      // Resolve location: date override takes priority over weekly default
+      let resolvedLocation = null
+      if (overrideRes.data?.locations) {
+        resolvedLocation = overrideRes.data.locations
+      } else if (hoursRes.data?.locations) {
+        resolvedLocation = hoursRes.data.locations
+      }
+
+      setLocation(resolvedLocation)
+      if (onLocationResolved) onLocationResolved(resolvedLocation)
 
       const computed = computeTimeSlots(
         hoursRes.data,
@@ -69,11 +95,25 @@ export default function TimePicker({ date, service, selectedTime, onSelect }) {
       <h2 className="text-xs font-medium uppercase tracking-wider text-neutral-500 mb-3">
         Available times
       </h2>
+
+      {location && (
+        <div className="flex items-start gap-2 mb-4 px-3 py-2.5 bg-neutral-950 border border-neutral-800 rounded-lg text-sm text-neutral-300">
+          <span className="mt-0.5">📍</span>
+          <div>
+            <span className="font-medium text-neutral-100">{location.name}</span>
+            {location.address && (
+              <span className="text-neutral-500"> · {location.address}</span>
+            )}
+          </div>
+        </div>
+      )}
+
       {!anyAvailable && (
         <p className="text-neutral-500 mb-3">
           No times available on this day. Please pick another date.
         </p>
       )}
+
       <div className="grid grid-cols-4 gap-2">
         {slots.map((slot) => {
           const isSelected = selectedTime === slot.time

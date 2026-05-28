@@ -55,7 +55,8 @@ export default function AppointmentsView() {
       .select(`
         id, customer_name, customer_phone, customer_email,
         appointment_date, start_time, end_time, status,
-        services ( name, price )
+        services ( name, price ),
+        locations ( name, address )
       `)
       .neq('status', 'cancelled')
 
@@ -186,6 +187,11 @@ export default function AppointmentsView() {
                     {a.services?.name} · {a.customer_phone}
                     {a.customer_email && ` · ${a.customer_email}`}
                   </div>
+                  {a.locations?.name && (
+                    <div className="text-xs text-neutral-600 mt-0.5 truncate">
+                      📍 {a.locations.name}{a.locations.address ? ` · ${a.locations.address}` : ''}
+                    </div>
+                  )}
                 </div>
                 <div className="text-right shrink-0">
                   <div className="font-medium text-emerald-400">${a.services?.price}</div>

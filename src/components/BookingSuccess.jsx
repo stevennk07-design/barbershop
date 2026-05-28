@@ -34,6 +34,17 @@ export default function BookingSuccess({ booking, onBookAnother }) {
           <span className="text-neutral-500">Date & time</span>
           <span className="text-neutral-200">{formatDate(booking.date)} · {formatTime(booking.time)}</span>
         </div>
+        {booking.location && (
+          <div className="flex justify-between py-1.5 border-b border-neutral-900 text-sm">
+            <span className="text-neutral-500">Location</span>
+            <span className="text-neutral-200 text-right">
+              <span className="font-medium">{booking.location.name}</span>
+              {booking.location.address && (
+                <span className="block text-neutral-500 text-xs mt-0.5">{booking.location.address}</span>
+              )}
+            </span>
+          </div>
+        )}
         <div className="flex justify-between py-1.5 text-sm">
           <span className="text-neutral-500">Total</span>
           <span className="font-medium text-neutral-100">${booking.service.price}</span>

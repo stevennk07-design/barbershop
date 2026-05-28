@@ -68,6 +68,7 @@ export default function ConfirmBooking({ booking, onConfirmed }) {
         appointment_date: booking.date,
         start_time: booking.time,
         end_time: endTime,
+        location_id: booking.location?.id || null,
       })
       .select()
       .single()
@@ -99,6 +100,16 @@ export default function ConfirmBooking({ booking, onConfirmed }) {
         <SummaryRow label="Service" value={booking.service.name} />
         <SummaryRow label="Date" value={formatDate(booking.date)} />
         <SummaryRow label="Time" value={formatTime(booking.time)} />
+        {booking.location && (
+          <SummaryRow
+            label="Location"
+            value={
+              booking.location.address
+                ? `${booking.location.name} · ${booking.location.address}`
+                : booking.location.name
+            }
+          />
+        )}
         <SummaryRow label="Duration" value={`${booking.service.duration_minutes} min`} />
         <SummaryRow label="Price" value={`$${booking.service.price}`} bold />
       </div>

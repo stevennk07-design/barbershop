@@ -5,6 +5,7 @@ import AppointmentsView from './AppointmentsView'
 import AvailabilityEditor from './AvailabilityEditor'
 import ServicesEditor from './ServicesEditor'
 import SettingsEditor from './SettingsEditor'
+import LocationsEditor from './LocationsEditor'
 
 export default function AdminPage() {
   const [session, setSession] = useState(null)
@@ -58,6 +59,7 @@ export default function AdminPage() {
         {activeTab === 'appointments' && <AppointmentsView />}
         {activeTab === 'availability' && <AvailabilityEditor />}
         {activeTab === 'services' && <ServicesEditor />}
+        {activeTab === 'locations' && <LocationsEditor />}
         {activeTab === 'settings' && <SettingsEditor />}
       </div>
     </div>
@@ -69,6 +71,7 @@ function TabBar({ active, onChange }) {
     { id: 'appointments', label: 'Appointments' },
     { id: 'availability', label: 'Availability' },
     { id: 'services', label: 'Services' },
+    { id: 'locations', label: 'Locations' },
     { id: 'settings', label: 'Shop info' },
   ]
   return (

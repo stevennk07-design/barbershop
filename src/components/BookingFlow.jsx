@@ -8,7 +8,7 @@ import BookingSuccess from './BookingSuccess'
 
 export default function BookingFlow() {
   const [step, setStep] = useState(1)
-  const [booking, setBooking] = useState({ service: null, date: null, time: null })
+  const [booking, setBooking] = useState({ service: null, date: null, time: null, location: null })
   const [confirmedBooking, setConfirmedBooking] = useState(null)
   const [settings, setSettings] = useState(null)
 
@@ -30,7 +30,7 @@ export default function BookingFlow() {
   }
 
   function resetFlow() {
-    setBooking({ service: null, date: null, time: null })
+    setBooking({ service: null, date: null, time: null, location: null })
     setConfirmedBooking(null)
     setStep(1)
   }
@@ -102,7 +102,7 @@ export default function BookingFlow() {
                 <>
                   <DatePicker
                     selectedDate={booking.date}
-                    onSelect={(d) => updateBooking({ date: d })}
+                    onSelect={(d) => updateBooking({ date: d, time: null, location: null })}
                   />
                   <div className="flex gap-3 mt-6">
                     <button
@@ -129,6 +129,7 @@ export default function BookingFlow() {
                     service={booking.service}
                     selectedTime={booking.time}
                     onSelect={(t) => updateBooking({ time: t })}
+                    onLocationResolved={(loc) => updateBooking({ location: loc })}
                   />
                   <div className="flex gap-3 mt-6">
                     <button
