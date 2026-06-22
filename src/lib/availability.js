@@ -24,11 +24,14 @@ function overlaps(aStart, aEnd, bStart, bEnd) {
   return aStart < bEnd && bStart < aEnd
 }
 
-export function computeTimeSlots(weeklyRow, blocks, recurringBlocks, appts, serviceDuration, now, dateStr) {
-  if (!weeklyRow || !weeklyRow.is_open) return []
+// opening: { start_time, end_time } from availability_openings, or null/undefined
+export function computeTimeSlots(weeklyRow, blocks, recurringBlocks, appts, serviceDuration, now, dateStr, opening) {
+  const hasOpening = opening && opening.start_time && opening.end_time
 
-  const openMin = toMinutes(weeklyRow.open_time)
-  const closeMin = toMinutes(weeklyRow.close_time)
+  if (!hasOpening && (!weeklyRow || !weeklyRow.is_open)) return []
+
+  const openMin = toMinutes(hasOpening ? opening.start_time : weeklyRow.open_time)
+  const closeMin = toMinutes(hasOpening ? opening.end_time : weeklyRow.close_time)
   const SLOT_INTERVAL = 30
 
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`

@@ -18,7 +18,7 @@ export default function TimePicker({ date, service, selectedTime, onSelect, onLo
       const dateObj = new Date(y, m - 1, d)
       const dayOfWeek = dateObj.getDay()
 
-      const [hoursRes, blocksRes, recurringRes, apptsRes, overrideRes] = await Promise.all([
+      const [hoursRes, blocksRes, recurringRes, apptsRes, overrideRes, openingRes] = await Promise.all([
         supabase
           .from('weekly_hours')
           .select('*, locations(id, name, address)')
@@ -36,6 +36,11 @@ export default function TimePicker({ date, service, selectedTime, onSelect, onLo
           .select('*, locations(id, name, address)')
           .eq('date', date)
           .maybeSingle(),
+        supabase
+          .from('availability_openings')
+          .select('*')
+          .eq('date', date)
+          .maybeSingle(),
       ])
 
       if (hoursRes.error || blocksRes.error || recurringRes.error || apptsRes.error) {
@@ -44,7 +49,6 @@ export default function TimePicker({ date, service, selectedTime, onSelect, onLo
         return
       }
 
-      // Resolve location: date override takes priority over weekly default
       let resolvedLocation = null
       if (overrideRes.data?.locations) {
         resolvedLocation = overrideRes.data.locations
@@ -62,7 +66,8 @@ export default function TimePicker({ date, service, selectedTime, onSelect, onLo
         apptsRes.data || [],
         service.duration_minutes,
         new Date(),
-        date
+        date,
+        openingRes.data || null
       )
 
       setSlots(computed)

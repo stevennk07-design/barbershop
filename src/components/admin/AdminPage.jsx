@@ -6,6 +6,8 @@ import AvailabilityEditor from './AvailabilityEditor'
 import ServicesEditor from './ServicesEditor'
 import SettingsEditor from './SettingsEditor'
 import LocationsEditor from './LocationsEditor'
+import AnnouncementsEditor from './AnnouncementsEditor'
+import AnnouncementsSidebar from '../AnnouncementsSidebar'
 
 export default function AdminPage() {
   const [session, setSession] = useState(null)
@@ -40,27 +42,32 @@ export default function AdminPage() {
   if (!session) return <AdminLogin />
 
   return (
-    <div className="min-h-screen bg-black text-neutral-100 p-4 sm:p-8">
-      <div className="max-w-3xl mx-auto">
-        <header className="flex justify-between items-center mb-6 pb-4 border-b border-neutral-800">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Admin</h1>
-            <p className="text-sm text-neutral-500 mt-1">Signed in as {session.user.email}</p>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 text-sm border border-neutral-800 rounded-lg hover:bg-neutral-900 text-neutral-300"
-          >
-            Sign out
-          </button>
-        </header>
+    <div className="min-h-screen bg-black text-neutral-100 md:flex">
+      <AnnouncementsSidebar />
 
-        <TabBar active={activeTab} onChange={setActiveTab} />
-        {activeTab === 'appointments' && <AppointmentsView />}
-        {activeTab === 'availability' && <AvailabilityEditor />}
-        {activeTab === 'services' && <ServicesEditor />}
-        {activeTab === 'locations' && <LocationsEditor />}
-        {activeTab === 'settings' && <SettingsEditor />}
+      <div className="flex-1 p-4 sm:p-8">
+        <div className="max-w-3xl mx-auto">
+          <header className="flex justify-between items-center mb-6 pb-4 border-b border-neutral-800">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">Admin</h1>
+              <p className="text-sm text-neutral-500 mt-1">Signed in as {session.user.email}</p>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 text-sm border border-neutral-800 rounded-lg hover:bg-neutral-900 text-neutral-300"
+            >
+              Sign out
+            </button>
+          </header>
+
+          <TabBar active={activeTab} onChange={setActiveTab} />
+          {activeTab === 'appointments' && <AppointmentsView />}
+          {activeTab === 'availability' && <AvailabilityEditor />}
+          {activeTab === 'services' && <ServicesEditor />}
+          {activeTab === 'locations' && <LocationsEditor />}
+          {activeTab === 'announcements' && <AnnouncementsEditor />}
+          {activeTab === 'settings' && <SettingsEditor />}
+        </div>
       </div>
     </div>
   )
@@ -72,6 +79,7 @@ function TabBar({ active, onChange }) {
     { id: 'availability', label: 'Availability' },
     { id: 'services', label: 'Services' },
     { id: 'locations', label: 'Locations' },
+    { id: 'announcements', label: 'Announcements' },
     { id: 'settings', label: 'Shop info' },
   ]
   return (

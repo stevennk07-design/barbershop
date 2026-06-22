@@ -6,6 +6,7 @@ const MONTH_NAMES = ['January','February','March','April','May','June','July','A
 
 export default function DatePicker({ selectedDate, onSelect }) {
   const [weeklyHours, setWeeklyHours] = useState([])
+  const [openingDates, setOpeningDates] = useState(new Set())
   const [loading, setLoading] = useState(true)
   const [viewMonth, setViewMonth] = useState(() => {
     const today = new Date()
@@ -13,12 +14,18 @@ export default function DatePicker({ selectedDate, onSelect }) {
   })
 
   useEffect(() => {
-    async function fetchHours() {
-      const { data, error } = await supabase.from('weekly_hours').select('*')
-      if (!error) setWeeklyHours(data)
+    async function fetchData() {
+      const today = new Date()
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+      const [hoursRes, openingsRes] = await Promise.all([
+        supabase.from('weekly_hours').select('*'),
+        supabase.from('availability_openings').select('date').gte('date', todayStr),
+      ])
+      if (!hoursRes.error) setWeeklyHours(hoursRes.data)
+      if (!openingsRes.error) setOpeningDates(new Set((openingsRes.data || []).map((o) => o.date)))
       setLoading(false)
     }
-    fetchHours()
+    fetchData()
   }, [])
 
   if (loading) return <p className="text-neutral-500">Loading calendar...</p>
@@ -91,14 +98,17 @@ export default function DatePicker({ selectedDate, onSelect }) {
           const iso = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
 
           const isPast = date < today
-          const isClosed = openDays[dow] === false
+          const normallyOpen = openDays[dow] !== false
+          const hasSpecialOpening = openingDates.has(iso)
+          const isClosed = !normallyOpen && !hasSpecialOpening
           const isToday = date.getTime() === today.getTime()
           const isSelected = selectedDate === iso
           const disabled = isPast || isClosed
 
-          let classes = 'text-center text-sm py-2 rounded transition '
+          let classes = 'text-center text-sm py-2 rounded transition relative '
           if (isSelected) classes += 'bg-neutral-100 text-black font-medium'
           else if (disabled) classes += 'text-neutral-700 cursor-not-allowed' + (isClosed && !isPast ? ' line-through' : '')
+          else if (hasSpecialOpening && !normallyOpen) classes += 'hover:bg-emerald-950 cursor-pointer text-emerald-300 ring-1 ring-emerald-800'
           else classes += 'hover:bg-neutral-900 cursor-pointer text-neutral-200'
           if (isToday && !isSelected) classes += ' ring-1 ring-neutral-700'
 
@@ -114,6 +124,12 @@ export default function DatePicker({ selectedDate, onSelect }) {
           )
         })}
       </div>
+
+      {openingDates.size > 0 && (
+        <p className="text-xs text-emerald-700 mt-3">
+          Highlighted dates have special hours.
+        </p>
+      )}
     </div>
   )
 }
